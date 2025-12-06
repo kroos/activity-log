@@ -53,21 +53,21 @@ trait Auditable
 	public static function bootAuditable()
 	{
 	    static::created(fn(Model $m) => $m->logActivity('created'));
-	
+
 	    static::updating(fn(Model $m) => $m->auditOldAttributes = $m->getOriginal());
-	
+
 	    static::updated(function (Model $m) {
 	        $m->logActivity('updated', $m->auditOldAttributes ?? []);
 	        unset($m->auditOldAttributes);
 	    });
-	
+
 	    static::deleted(function (Model $m) {
 	        $event = method_exists($m, 'isForceDeleting') && $m->isForceDeleting()
 	            ? 'force_deleted'
 	            : 'deleted';
 	        $m->logActivity($event);
 	    });
-	
+
 	    // register "restored" only if model supports SoftDeletes
 	    if (method_exists(static::class, 'restored')) {
 	        static::restored(fn(Model $m) => $m->logActivity('restored'));
@@ -131,7 +131,7 @@ trait Auditable
 			try { $req = Request::instance(); } catch (\Throwable) {}
 
 			ActivityLog::create([
-				'user_id'     => Auth::id(),
+				'user_id'     => Auth::id()??Auth::user()->user_id,
 				'event'       => $event,
 				'model_type'  => static::class,
 				'model_id'    => $this->getKey(),
