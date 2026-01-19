@@ -1,0 +1,306 @@
+You have two valid ways to paginate with DataTables.
+Right now you are doing client-side processing (->get() + dataSrc: ''), so pagination is fake (DataTables paginates in JS after loading all rows).
+For activity logs (which usually grow big), the correct & scalable way is DataTables server-side pagination.
+Below is the proper production-ready solution.
+
+✅ Correct Approach: DataTables Server-Side Pagination
+1️⃣ Enable server-side mode in DataTables
+You must let DataTables control paging, ordering, and searching via AJAX params.
+$('#logs-table').DataTable({
+	processing: true,
+	serverSide: true,
+
+	lengthMenu: [[10, 50, 100, 200], [10, 50, 100, 200]],
+	order: [[0, 'desc']],
+	responsive: true,
+	fixedHeader: true,
+
+	ajax: {
+		url: '{{ route('getActivityLogs') }}',
+		type: 'GET',
+		data: function (d) {
+			d.search_value = d.search.value; // map DataTables search
+		}
+	},
+
+	columns: [
+		{ data: 'id', title: 'ID' },
+
+		{
+			data: 'event',
+			title: 'Event',
+			render: data => data.charAt(0).toUpperCase() + data.slice(1)
+		},
+
+		{
+			data: null,
+			title: 'Model',
+			render: function (row) {
+				let modelName = row.model_type ? row.model_type.split('\\').pop() : '-';
+				let modelId = row.model_id ? ` #${row.model_id}` : '';
+				return `${modelName}${modelId}`;
+			}
+		},
+
+		{
+			data: null,
+			title: 'User',
+			render: function (row) {
+				if (row.staff_id == 117 || row.staff_id == 72) {
+					return 'Admin';
+				}
+				return row.belongstouser?.name ?? 'System';
+			}
+		},
+
+		{ data: 'ip_address', title: 'IP Address' },
+
+		{
+			data: 'created_at',
+			title: 'Timestamp',
+			render: data => moment(data).format('D MMM YYYY h:mm a')
+		},
+
+		{
+			data: 'id',
+			orderable: false,
+			searchable: false,
+			render: function (id) {
+				return `
+				<div class="btn-group btn-group-sm">
+					<a href="{{ url('activity-logs') }}/${id}" class="btn btn-outline-primary">
+						<i class="fa fa-eye"></i>
+					</a>
+					<button class="btn btn-outline-danger btn-del" data-id="${id}">
+						<i class="fa fa-trash"></i>
+					</button>
+				</div>`;
+			}
+		}
+	]
+});
+
+
+2️⃣ Laravel Controller (Proper Server-Side Pagination)
+🔥 DO NOT use get()
+DataTables sends:
+
+
+start
+
+
+length
+
+
+search[value]
+
+
+order[column][dir]
+
+
+✅ Correct Controller:
+public function getActivityLogs(Request $request): JsonResponse
+{
+	$columns = [
+		0 => 'id',
+		1 => 'event',
+		2 => 'model_type',
+		3 => 'staff_id',
+		4 => 'ip_address',
+		5 => 'created_at',
+	];
+
+	$query = ActivityLog::with('belongstouser');
+
+	// 🔍 Global search
+	if ($request->search_value) {
+		$query->where(function ($q) use ($request) {
+			$q->where('model_type', 'LIKE', '%' . $request->search_value . '%')
+			  ->orWhere('ip_address', 'LIKE', '%' . $request->search_value . '%');
+		});
+	}
+
+	$totalRecords = ActivityLog::count();
+	$filteredRecords = $query->count();
+
+	// 🔃 Ordering
+	$orderColumn = $columns[$request->order[0]['column']] ?? 'created_at';
+	$orderDir = $request->order[0]['dir'] ?? 'desc';
+
+	$data = $query
+		->orderBy($orderColumn, $orderDir)
+		->skip($request->start)
+		->take($request->length)
+		->get();
+
+	return response()->json([
+		'draw' => intval($request->draw),
+		'recordsTotal' => $totalRecords,
+		'recordsFiltered' => $filteredRecords,
+		'data' => $data,
+	]);
+}
+
+
+3️⃣ Why this is the correct solution
+FeatureClient-sideServer-sideLarge dataset❌ Slow✅ FastMemory usage❌ High✅ LowSearchJS onlyDB optimizedPaginationFakeRealProduction-ready❌✅
+
+⚠️ Common Mistakes to Avoid
+❌ ->get()
+❌ dataSrc: ''
+❌ Returning raw collections
+❌ Letting DataTables paginate thousands of rows
+
+✅ Optional Upgrade (Recommended)
+Since you already use Laravel heavily:
+
+
+Yajra DataTables → 80% less code
+
+
+Built-in ordering/search/pagination
+
+
+If you want, I can:
+
+
+🔥 Convert this to Yajra DataTables
+
+
+🔥 Add column-based search
+
+
+🔥 Optimize indexes for large activity_logs table
+
+
+🔥 Secure it for high traffic
+
+
+Just tell me 👍
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Good question 👍
+Since belongstouser.name is a related table column, you must search it via whereHas() (or a join).
+Because you’re already doing DataTables server-side, this fits cleanly.
+
+✅ Correct Way: search belongstouser.name using whereHas
+🔧 Update your search block in controller
+// 🔍 Global search (including related user name)
+if ($request->search_value) {
+	$search = $request->search_value;
+
+	$query->where(function ($q) use ($search) {
+		$q->where('model_type', 'LIKE', "%{$search}%")
+		  ->orWhere('ip_address', 'LIKE', "%{$search}%")
+
+		  // 👇 search related user name
+		  ->orWhereHas('belongstouser', function ($uq) use ($search) {
+			  $uq->where('name', 'LIKE', "%{$search}%");
+		  });
+	});
+}
+
+
+✅ This will allow DataTables search box to match:
+
+model_type
+
+ip_address
+
+users.name
+
+🔎 Important: relationship must be correct
+
+Your ActivityLog model must have:
+
+public function belongstouser()
+{
+	return $this->belongsTo(User::class, 'staff_id');
+}
+
+
+(Adjust FK if different.)
+
+⚠️ VERY IMPORTANT (count issue)
+
+Because whereHas() modifies the query, always clone before counting:
+
+$totalRecords = ActivityLog::count();
+$filteredRecords = (clone $query)->count();
+
+
+Otherwise your pagination will break ❌
+
+🚀 Full Search + Pagination (Clean Version)
+$query = ActivityLog::with('belongstouser');
+
+if ($request->search_value) {
+	$search = $request->search_value;
+
+	$query->where(function ($q) use ($search) {
+		$q->where('model_type', 'LIKE', "%{$search}%")
+		  ->orWhere('ip_address', 'LIKE', "%{$search}%")
+		  ->orWhereHas('belongstouser', function ($uq) use ($search) {
+			  $uq->where('name', 'LIKE', "%{$search}%");
+		  });
+	});
+}
+
+$totalRecords = ActivityLog::count();
+$filteredRecords = (clone $query)->count();
+
+$data = $query
+	->orderBy('created_at', 'desc')
+	->skip($request->start)
+	->take($request->length)
+	->get();
+
+⚡ Performance Tip (IMPORTANT for activity logs)
+
+If table is big, add index:
+
+CREATE INDEX idx_activity_logs_staff_id ON activity_logs(staff_id);
+CREATE INDEX idx_users_name ON users(name);
+
+
+This makes whereHas() fast 🚀
+
+✅ Alternative (FASTER for very large tables)
+
+Use LEFT JOIN instead of whereHas (better performance):
+
+$query = ActivityLog::query()
+	->leftJoin('users', 'users.id', '=', 'activity_logs.staff_id')
+	->select('activity_logs.*')
+	->with('belongstouser');
+
+
+Then search directly:
+
+->orWhere('users.name', 'LIKE', "%{$search}%");
+
+
+If you want, I can:
+
+🔥 Convert your code to JOIN-based (fastest)
+
+🔥 Add column-specific search
+
+🔥 Add search debounce
+
+🔥 Make it index-optimized for millions of rows
+
+Just tell me which route you want 👌

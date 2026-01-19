@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('activity_logs', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
+            // $table->integer('staff_id')->nullable();
             $table->string('event', 64);
             $table->string('model_type');
             $table->unsignedBigInteger('model_id')->index();
@@ -32,7 +33,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->index(['model_type', 'model_id']);
-            $table->index(['user_id']);
+            $table->index(['staff_id']);
             $table->index(['event']);
         });
     }
