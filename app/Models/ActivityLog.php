@@ -41,21 +41,16 @@ class ActivityLog extends Model
 
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// set column attribute
-	// public function setNameAttribute($value)
-	// {
-	//     $this->attributes['name'] = ucwords(Str::lower($value));
-	// }
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// relationship
-	public function belongstouser(): BelongsTo
-	{
-		return $this->belongsTo(\App\Models\User::class);
-	}
+	// public function belongstouser(): BelongsTo
+	// {
+	// 	return $this->belongsTo(\App\Models\User::class, 'user_id');
+	// }
 
-	public function model()
-	{
-		return $this->morphTo();
-	}
+	// public function model()
+	// {
+	// 	return $this->morphTo();
+	// }
 }

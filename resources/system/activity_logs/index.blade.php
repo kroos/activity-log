@@ -12,7 +12,7 @@
 @endsection
 
 @section('js')
-$('#logs-table').DataTable({
+var table = $('#logs-table').DataTable({
 	lengthMenu: [ [100, 200, 500, 1000], [100, 200, 500, 1000] ],
 	order: [[ 0, 'desc' ], [1, 'desc']],
 	responsive: true,
@@ -48,19 +48,24 @@ $('#logs-table').DataTable({
 				return `${modelName}${modelId}`;
 			}
 		},
+		// {
+		// 	data: null,
+		// 	title:'User',
+		// 	defaultContent: 'System',
+		// 	render: function(data, type, row){
+		// 		if(
+		// 			data.staff_id == 117 ||
+		// 			data.staff_id == 72
+		// 		){
+		// 			return `Admin`;
+		// 		}
+		// 		return data.belongstouser.name;
+		// 	}
+		// },
 		{
-			data: null,
+			data: 'name',
 			title:'User',
-			defaultContent: 'System',
-			render: function(data, type, row){
-				if(
-					data.staff_id == 117 ||
-					data.staff_id == 72
-				){
-					return `Admin`;
-				}
-				return data.belongstouser.name;
-			}
+			defaultContent: 'System'
 		},
 		{ data:'ip_address', title:'IP Address' },
 		{ data:'created_at', title:'Timestamp', render: data => moment(data).format('D MMM YYYY h:mm a') },
@@ -102,7 +107,7 @@ $(document).on('click', '.btn-del', function (e) {
 				url: `{{ url("activity-logs") }}/${id}`,
 				type: 'DELETE',
 				data: {_token:'{{ csrf_token() }}'},
-				success: ()=> location.reload()
+				success: ()=> table.ajax.reload()
 			});
 		}
 	});

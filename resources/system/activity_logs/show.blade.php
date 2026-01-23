@@ -3,9 +3,9 @@
 @section('content')
 <div class="card">
   <div class="card-header d-flex justify-content-between align-items-center">
-    <h5 class="mb-0"><i class="fa-brands fa-searchengin"></i> Log Detail</h5>
+    <h5 class="mb-0"><i class="fa fa-search"></i> Log Detail</h5>
     <a href="{{ route('activity-logs.index') }}" class="btn btn-light btn-sm">
-      <i class="fa-regular fa-circle-left"></i> Back
+      <i class="fa fa-arrow-left"></i> Back
     </a>
   </div>
   <div class="card-body">
@@ -13,7 +13,7 @@
       <div class="col-md-6">
         <strong>Event:</strong> {{ ucfirst($log->event) }} <br>
         <strong>Model:</strong> {{ class_basename($log->model_type) }} #{{ $log->model_id }} <br>
-        <strong>User:</strong> {{ $log->user?->name ?? 'System' }} <br>
+        <strong>User:</strong> {{ ($log?->name }} <br>
         <strong>IP:</strong> {{ $log->ip_address }}
       </div>
       <div class="col-md-6">
