@@ -30,7 +30,7 @@ class User extends Authenticatable
 	// audit
 	// protected static $auditExclude = ['password'];
 	protected static $auditIncludeSnapshot = true;
-	protected static $auditCriticalEvents = ['create', 'updated', 'deleted','force_deleted'];
+	protected static $auditCriticalEvents = ['created', 'updated', 'deleted','force_deleted'];
 
 	// protected $connection = 'mysql';
 	protected $table = 'users';

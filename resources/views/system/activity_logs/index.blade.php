@@ -78,10 +78,10 @@ var table = $('#logs-table').DataTable({
 				return `
 				<div class="btn-group btn-group-sm" role="group">
 					<a href="{{ url('activity-logs') }}/${id}" class="btn btn-sm btn-outline-primary">
-						<i class="fa fa-eye"></i>
+						<i class="fa-regular fa-eye"></i>
 					</a>
 					<button type="button" class="btn btn-sm btn btn-outline-danger btn-del" data-id="${id}">
-						<i class="fa fa-trash"></i>
+						<i class="fa-regular fa-trash-can"></i>
 					</button>
 				</div>
 				`

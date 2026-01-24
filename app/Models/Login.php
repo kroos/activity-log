@@ -29,11 +29,11 @@ class Login extends Authenticatable implements MustVerifyEmail
 	// audit
 	protected static $auditExclude = ['password','remember_token'];
 	protected static $auditIncludeSnapshot = true;
-	protected static $auditCriticalEvents = ['updated', 'deleted','force_deleted'];
+	protected static $auditCriticalEvents = ['created', 'updated', 'deleted','force_deleted'];
 
 	// protected $connection = 'mysql';
 	protected $table = 'logins';
-	protected $primaryKey = 'id';
+	// protected $primaryKey = 'id';
 
 	 /**
 	 * The attributes that are mass assignable.
