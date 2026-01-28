@@ -18,6 +18,9 @@
       </div>
       <div class="col-md-6">
         <strong>Created At:</strong> {{ $log->created_at->format('j M Y h:i:s a') }} <br>
+        <strong>Route </strong> {{ $log->route_name }} <br>
+        <strong>Method:</strong> {{ $log->method }} <br>
+        <strong>URL:</strong> {{ $log->url }} <br>
         <strong>User Agent:</strong> <small>{{ $log->user_agent }}</small>
       </div>
     </div>
