@@ -13,7 +13,7 @@
       <div class="col-md-6">
         <strong>Event:</strong> {{ ucfirst($log->event) }} <br>
         <strong>Model:</strong> {{ class_basename($log->model_type) }} #{{ $log->model_id }} <br>
-        <strong>User:</strong> {{ ($log?->name }} <br>
+        <strong>User:</strong> {{ $log?->user }} <br>
         <strong>IP:</strong> {{ $log->ip_address }}
       </div>
       <div class="col-md-6">

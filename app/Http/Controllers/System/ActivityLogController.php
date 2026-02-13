@@ -88,7 +88,7 @@ class ActivityLogController extends Controller
 			0 => 'id',
 			1 => 'event',
 			2 => 'model_type',
-			3 => 'name',
+			3 => 'user',
 			4 => 'ip_address',
 			5 => 'created_at',
 			6 => 'route_name',
@@ -99,7 +99,7 @@ class ActivityLogController extends Controller
 			'id',
 			'event',
 			'model_type',
-			'name',
+			'user',
 			'ip_address',
 			'created_at',
 			'route_name',
@@ -115,7 +115,7 @@ class ActivityLogController extends Controller
 				->orWhere('model_id', 'LIKE', "%{$search}%")
 				->orWhere('created_at', 'LIKE', "%{$search}%")
 				->orWhere('route_name', 'LIKE', "%{$search}%")
-				->orWhere('name', 'LIKE', "%{$search}%");
+				->orWhere('user', 'LIKE', "%{$search}%");
 			});
 		}
 
