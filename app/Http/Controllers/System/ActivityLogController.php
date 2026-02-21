@@ -83,16 +83,16 @@ class ActivityLogController extends Controller
 		];
 
 		$query = ActivityLog::select([
-			id',
-			user',
-			event',
-			model_type',
-			route_name',
-			method',
-			url',
-			ip_address',
-			user_agent',
-			is_critical',
+			'id',
+			'user',
+			'event',
+			'model_type',
+			'route_name',
+			'method',
+			'url',
+			'ip_address',
+			'user_agent',
+			'is_critical',
 			'created_at',
 		]);
 
