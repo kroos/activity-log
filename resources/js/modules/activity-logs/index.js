@@ -1,7 +1,4 @@
-const { route, url, old, errors } = window.data;
-function getError(name) {
-	return errors[name] ? errors[name][0] : null;
-}
+const { route, url } = window.data;
 
 var table = $('#logs-table').DataTable({
 	lengthMenu: [ [100, 200, 500, 1000], [100, 200, 500, 1000] ],
@@ -53,7 +50,7 @@ var table = $('#logs-table').DataTable({
 		// 	}
 		// },
 		{
-			data: 'user_id',
+			data: 'user',
 			title:'User',
 			defaultContent: 'System'
 		},

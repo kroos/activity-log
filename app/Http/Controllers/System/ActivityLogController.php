@@ -66,44 +66,34 @@ class ActivityLogController extends Controller
 		return response()->json(['success' => true]);
 	}
 
-	// this 1 need chunks sooner or later
-	// public function getActivityLogs(Request $request): JsonResponse
-	// {
-	// 	$values = ActivityLog::with('belongstouser')
-	// 										->when($request->search, function(Builder $query) use ($request){
-	// 											$query->where('model_type','LIKE','%'.$request->search.'%')
-	// 											->orWhere('ip_address','LIKE','%'.$request->search.'%');
-	// 										})
-	// 										->when($request->id, function($query) use ($request){
-	// 											$query->where('id', $request->id);
-	// 										})
-	// 										->orderBy('created_at', 'DESC')
-	// 										->get();
-	// 	return response()->json($values);
-	// }
-
 	public function getActivityLogs(Request $request): JsonResponse
 	{
 		$columns = [
 			0 => 'id',
-			1 => 'event',
-			2 => 'model_type',
-			3 => 'user',
-			4 => 'ip_address',
-			5 => 'created_at',
-			6 => 'route_name',
-			7 => 'model_id',
+			1 => 'user',
+			2 => 'event',
+			3 => 'model_type',
+			4 => 'route_name',
+			5 => 'method',
+			6 => 'url',
+			7 => 'ip_address',
+			8 => 'user_agent',
+			9 => 'is_critical',
+			10 => 'created_at',
 		];
 
 		$query = ActivityLog::select([
-			'id',
-			'event',
-			'model_type',
-			'user',
-			'ip_address',
+			id',
+			user',
+			event',
+			model_type',
+			route_name',
+			method',
+			url',
+			ip_address',
+			user_agent',
+			is_critical',
 			'created_at',
-			'route_name',
-			'model_id',
 		]);
 
 		if ($request->search_value) {

@@ -19,9 +19,6 @@ window.data = {
 	url: {
 		activitylogs: '{{ url('activity-logs') }}',
 	},
-	old: {
-	},
-	errors: @json($errors->toArray()),
 };
 
 @endsection
